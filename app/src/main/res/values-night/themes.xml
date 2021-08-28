@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Practica1_Calculadora" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#ffd588</item>
+        <item name="colorPrimaryVariant">#ffd588</item>
+        <item name="colorOnPrimary">#ffd588</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#ffd588</item>
+        <item name="colorSecondaryVariant">#ffd588</item>
+        <item name="colorOnSecondary">#ffd588</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+        <!-- Customize your theme here. -->
+    </style>
+</resources>
