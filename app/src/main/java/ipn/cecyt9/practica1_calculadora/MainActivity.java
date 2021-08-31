@@ -188,8 +188,10 @@ public class MainActivity extends AppCompatActivity {
                     if(tvText.charAt(lenght-2) != '(') {
                         tvText = tvText.substring(0, lenght-2) + ')';
                         tv.setText(tvText);
-                    } else
+                    } else {
                         tv.setText("");
+                        functionTrigo = false;
+                    }
 
                 } else if(!thereIsResultAsNumber) {
                     tvText = tvText.substring(0, tvText.length() - 1);
