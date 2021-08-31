@@ -4,13 +4,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.lang.Math;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,75 +22,144 @@ public class MainActivity extends AppCompatActivity {
     }
 
     static {
-        AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_NO);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
     double numero1, numero2, resultado;
     char signo;
-    boolean thereIsResultAsNumber = false;
+    boolean thereIsResultAsNumber = false, signoOper = false, functionTrigo = false;
 
     public void onClickButtonNumber(View myView){
         TextView tv = findViewById(R.id.textView);
         Button button = (Button) myView;
-        if(thereIsResultAsNumber && signo == ' ')
-            onClickButtonAC(myView);
         String resp = tv.getText().toString();
         String number = button.getText().toString();
-        tv.setText(String.format("%s%s", resp, number));
+
+        if((thereIsResultAsNumber && signo == ' ') || resp.equals("ERROR")) {
+            onClickButtonAC(myView);
+            tv.setText(number);
+        } else if(!functionTrigo) {
+            tv.setText(String.format("%s%s", resp, number));
+        } else{
+            resp = resp.substring(0, resp.length()-1);
+            tv.setText(String.format("%s%s)", resp, number));
+        }
     }
     
     public void onClickButtonOperation(View myView){
         TextView tv = findViewById(R.id.textView);
         Button button = (Button) myView;
-        signo = button.getText().charAt(0);
-
+        char signoButton = button.getText().charAt(0);
         try {
-            numero1 = Double.parseDouble(tv.getText().toString());
+            if(signoOper || functionTrigo){
+                signoOper = false;
+                throw new Exception();
+            }
+            numero1 = Double.parseDouble(String.valueOf(tv.getText()));
+            signo = signoButton;
             System.out.println(numero1);
             System.out.println(signo);
             onClickButtonNumber(myView);
+            signoOper = true;
+
         } catch(Exception e){
+
             if(thereIsResultAsNumber) {
                 numero1 = resultado;
+                signo = signoButton;
                 tv.setText(String.valueOf(numero1).replace(".0", ""));
                 tv = findViewById(R.id.resultado);
                 tv.setText("");
                 onClickButtonNumber(myView);
+                thereIsResultAsNumber = false;
+
+            } else if((signoButton == '+' || signoButton == '-') && !functionTrigo) {
+
+                onClickButtonNumber(myView);
+
             } else {
                 tv.setText("ERROR");
                 restart();
             }
+
         }
+
+    }
+
+    public void onClickButtonTrigonometry(View myView){
+        onClickButtonAC(myView);
+        TextView tv = findViewById(R.id.textView);
+        Button button = (Button) myView;
+        String oper = button.getText().toString();
+
+        if(oper.equals("sin")){
+            signo = 's';
+            tv.setText("sin()");
+        } else if(oper.equals("cos")){
+            signo = 'c';
+            tv.setText("cos()");
+        }
+
+        functionTrigo = true;
     }
 
     public void onClickButtonResult(View myView){
         TextView tv = findViewById(R.id.textView);
+        String tvText = tv.getText().toString();
+        String resultadoText = "";
 
         try {
-            String sobrante = String.valueOf(numero1).replace(".0", "") + signo;
-            System.out.println(sobrante);
-            System.out.println(tv.getText().toString());
-            String number = tv.getText().toString().replace(sobrante, "");
-            System.out.println(number);
-            numero2 = Double.parseDouble(number);
-            System.out.println(numero2);
+            if(!functionTrigo) {
+                System.out.println("signo "+signo);
+                int position = tvText.indexOf(signo);
+                System.out.println("posicion "+position);
+                //String sobrante = tvText.substring(signo+1, tvText.length());
+                //String sobrante = String.valueOf(numero1).replace(".0", "") + signo;
+                //System.out.println("sobrante" + sobrante);
+                System.out.println(tvText);
+                String number = tvText.substring(position+1, tvText.length());
+                //String number = tvText.replace(sobrante, "");
+                System.out.println("numero "+number);
+                numero2 = Double.parseDouble(number);
 
-            if (signo == '+')
-                resultado = numero1 + numero2;
-            else if (signo == '-')
-                resultado = numero1 - numero2;
-            else if (signo == '*')
-                resultado = numero1 * numero2;
-            else if (signo == '/')
-                resultado = numero1 / numero2;
-            else
-                resultado = Double.parseDouble(tv.getText().toString());
 
-            System.out.println(resultado);
+                System.out.println("numero" + numero2);
+
+                if (signo == '+')
+                    resultado = numero1 + numero2;
+                else if (signo == '-')
+                    resultado = numero1 - numero2;
+                else if (signo == '*')
+                    resultado = numero1 * numero2;
+                else if (signo == '/')
+                    resultado = numero1 / numero2;
+                else if (signo == '^')
+                    resultado = Math.pow(numero1, numero2);
+                else
+                    resultado = numero2;
+
+                System.out.println(resultado);
+
+
+            } else{
+
+                double number = Math.toRadians(Double.parseDouble(tvText.substring(4, tvText.length()-1)));
+                if(signo == 's')
+                    resultado = Math.sin(number);
+                else if(signo == 'c')
+                    resultado = Math.cos(number);
+
+            }
+
             tv = findViewById(R.id.resultado);
-            String resultadoText = String.valueOf(resultado).replace(".0", "");
-            if(resultadoText.length() >= 10)
+            resultadoText = String.valueOf(resultado);
+            int pos = resultadoText.indexOf(".0");
+
+            if(pos == resultadoText.length()-2)
+                resultadoText = String.valueOf(resultado).replace(".0", "");
+
+            if (resultadoText.length() >= 10)
                 resultadoText = resultadoText.substring(0, 11);
+
             tv.setText(resultadoText);
             thereIsResultAsNumber = true;
         } catch(Exception e){
@@ -115,7 +183,15 @@ public class MainActivity extends AppCompatActivity {
         try {
             String tvText = tv.getText().toString();
             if (!tvText.equals("ERROR")){
-                if(!thereIsResultAsNumber) {
+                if(functionTrigo){
+                    int lenght = tvText.length();
+                    if(tvText.charAt(lenght-2) != '(') {
+                        tvText = tvText.substring(0, lenght-2) + ')';
+                        tv.setText(tvText);
+                    } else
+                        tv.setText("");
+
+                } else if(!thereIsResultAsNumber) {
                     tvText = tvText.substring(0, tvText.length() - 1);
                     tv.setText(tvText);
                     tv = findViewById(R.id.resultado);
@@ -135,5 +211,7 @@ public class MainActivity extends AppCompatActivity {
         numero1 = 0;
         numero2 = 0;
         signo = ' ';
+        signoOper = false;
+        functionTrigo = false;
     }
 }
