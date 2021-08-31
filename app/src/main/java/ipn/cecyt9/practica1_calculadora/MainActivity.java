@@ -112,12 +112,8 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("signo "+signo);
                 int position = tvText.indexOf(signo);
                 System.out.println("posicion "+position);
-                //String sobrante = tvText.substring(signo+1, tvText.length());
-                //String sobrante = String.valueOf(numero1).replace(".0", "") + signo;
-                //System.out.println("sobrante" + sobrante);
                 System.out.println(tvText);
                 String number = tvText.substring(position+1, tvText.length());
-                //String number = tvText.replace(sobrante, "");
                 System.out.println("numero "+number);
                 numero2 = Double.parseDouble(number);
 
